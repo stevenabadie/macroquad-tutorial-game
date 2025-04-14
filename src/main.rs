@@ -1,4 +1,4 @@
-use macroquad::{miniquad::window::screen_size, prelude::*, rand::ChooseRandom};
+use macroquad::{prelude::*, rand::ChooseRandom};
 use macroquad_particles::{self as particles, ColorCurve, EmissionShape, Emitter, EmitterConfig};
 use std::fs;
 

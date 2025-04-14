@@ -127,6 +127,11 @@ async fn main() {
     let square_colors: [Color; 3] = [GREEN, LIGHTGRAY, BLUE];
 
     let mut score: u32 = 0;
+
+    #[cfg(target_arch = "wasm32")]
+    let mut high_score: u32 = 0;
+
+    #[cfg(not(target_arch = "wasm32"))]
     let mut high_score: u32 = fs::read_to_string("highscore.dat")
         .map_or(Ok(0), |i| i.parse::<u32>())
         .unwrap_or(0);

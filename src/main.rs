@@ -1,4 +1,5 @@
 use macroquad::{miniquad::window::screen_size, prelude::*, rand::ChooseRandom};
+use macroquad_particles::{self as particles, ColorCurve, EmissionShape, Emitter, EmitterConfig};
 use std::fs;
 
 const FRAGMENT_SHADER: &str = include_str!("starfield-shader.glsl");
@@ -63,6 +64,54 @@ impl Player {
     }
 }
 
+fn particle_explosion() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        local_coords: false,
+        one_shot: true,
+        emitting: true,
+        lifetime: 0.6,
+        lifetime_randomness: 0.3,
+        explosiveness: 0.65,
+        initial_direction_spread: 2.0 * std::f32::consts::PI,
+        initial_velocity: 300.0,
+        initial_velocity_randomness: 0.8,
+        size: 3.0,
+        size_randomness: 0.3,
+        colors_curve: ColorCurve {
+            start: RED,
+            mid: ORANGE,
+            end: RED,
+        },
+        ..Default::default()
+    }
+}
+
+fn particle_smoke() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        local_coords: false,
+        one_shot: true,
+        emitting: true,
+        lifetime: 0.6,
+        lifetime_randomness: 0.3,
+        explosiveness: 0.65,
+        initial_direction_spread: 2.0 * std::f32::consts::PI,
+        emission_shape: EmissionShape::Rect {
+            width: 10.0,
+            height: 100.0,
+        },
+        initial_velocity: 300.0,
+        initial_velocity_randomness: 0.8,
+        size: 5.5,
+        size_randomness: 0.0,
+        colors_curve: ColorCurve {
+            start: WHITE,
+            mid: GRAY,
+            end: BLACK,
+        },
+        ..Default::default()
+    }
+}
+
 enum GameState {
     MainMenu,
     Playing,
@@ -91,6 +140,7 @@ async fn main() {
         y: screen_height() / 2.0,
         color: YELLOW,
     };
+    let mut explosions: Vec<(Emitter, Vec2)> = vec![];
 
     let mut game_state = GameState::MainMenu;
 
@@ -138,6 +188,7 @@ async fn main() {
                 if is_key_pressed(KeyCode::Space) {
                     squares.clear();
                     bullets.clear();
+                    explosions.clear();
                     circle.x = screen_width() / 2.0;
                     circle.y = screen_height() / 2.0;
                     score = 0;
@@ -235,6 +286,8 @@ async fn main() {
                 bullets.retain(|bullet| bullet.y < screen_height() + bullet.size);
                 squares.retain(|bullet| !bullet.collided);
 
+                explosions.retain(|(explosion, _)| explosion.config.emitting);
+
                 for bullet in &bullets {
                     draw_circle(bullet.x, bullet.y, bullet.size, bullet.color);
                 }
@@ -247,6 +300,15 @@ async fn main() {
                         square.size,
                         square.color,
                     );
+                }
+                Emitter::new(EmitterConfig {
+                    amount: 20,
+                    ..particle_smoke()
+                })
+                .draw(Vec2::new(circle.x, circle.y + circle.radius + 50.0));
+
+                for (explosion, coords) in explosions.iter_mut() {
+                    explosion.draw(*coords);
                 }
 
                 draw_text(format!("Score {}", score).as_str(), 10.0, 35.0, 25.0, WHITE);
@@ -274,6 +336,13 @@ async fn main() {
                             square.collided = true;
                             score += square.size.round() as u32 / 2;
                             high_score = high_score.max(score);
+                            explosions.push((
+                                Emitter::new(EmitterConfig {
+                                    amount: square.size.round() as u32 * 2,
+                                    ..particle_explosion()
+                                }),
+                                vec2(square.x, square.y),
+                            ));
                         }
                     }
                 }

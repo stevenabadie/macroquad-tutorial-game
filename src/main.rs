@@ -80,7 +80,7 @@ fn particle_explosion() -> particles::EmitterConfig {
         colors_curve: ColorCurve {
             start: RED,
             mid: ORANGE,
-            end: RED,
+            end: YELLOW,
         },
         ..Default::default()
     }

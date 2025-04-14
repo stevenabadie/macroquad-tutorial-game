@@ -122,6 +122,10 @@ enum GameState {
 #[macroquad::main("My game")]
 async fn main() {
     rand::srand(miniquad::date::now() as u64);
+
+    #[cfg(target_arch = "wasm32")]
+    console_error_panic_hook::set_once();
+
     const MOVEMENT_SPEED: f32 = 200.0;
     const CIRCLE_RADIUS: f32 = 16.0;
     let square_colors: [Color; 3] = [GREEN, LIGHTGRAY, BLUE];

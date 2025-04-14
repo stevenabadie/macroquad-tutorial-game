@@ -332,6 +332,7 @@ async fn main() {
                 );
 
                 if squares.iter().any(|square| circle.collides_with(square)) {
+                    #[cfg(target_arch = "wasm32")]
                     if score == high_score {
                         fs::write("highscore.dat", high_score.to_string()).ok();
                     }

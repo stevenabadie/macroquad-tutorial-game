@@ -171,7 +171,7 @@ async fn main() {
             ..Default::default()
         },
     )
-    .unwrap();
+    .expect("Shader failed to compile");
 
     loop {
         clear_background(BLACK);

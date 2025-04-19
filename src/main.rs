@@ -121,6 +121,11 @@ enum GameState {
 
 #[macroquad::main("My game")]
 async fn main() {
+    #[cfg(target_arch = "wasm32")]
+    sapp_console_log::init().unwrap();
+    #[cfg(not(target_arch = "wasm32"))]
+    env_logger::init();
+
     rand::srand(miniquad::date::now() as u64);
 
     const MOVEMENT_SPEED: f32 = 200.0;

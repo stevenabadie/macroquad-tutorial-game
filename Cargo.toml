@@ -6,3 +6,8 @@ edition = "2024"
 [dependencies]
 macroquad = "0.4"
 macroquad-particles = "0.2.2"
+log = "0.4"
+[target.wasm32-unknown-unknown.dependencies]
+sapp-console-log = "0.1"
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+env_logger = "0.7"

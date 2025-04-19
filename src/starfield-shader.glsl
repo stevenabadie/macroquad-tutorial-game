@@ -7,10 +7,7 @@
 
 precision highp float;
 
-varying vec4 color;
-varying vec2 uv;
-varying float iTime;
-
+uniform float iTime;
 uniform vec2 iResolution;
 uniform float direction_modifier;
 
